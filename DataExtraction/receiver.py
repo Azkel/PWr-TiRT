@@ -3,7 +3,6 @@
 import socket
 import pickle
 import dpkt
-import print_packets
 
 def listen():
     tcp_ip = '127.0.0.1'
