@@ -5,6 +5,6 @@ def filter_frames(data):
     filtered_data = []
     for frame in data:
         eth = dpkt.ethernet.Ethernet(frame)
-        if eth.type == dpkt.ethernet.ETH_TYPE_IP or eth.type == dpkt.ethernet.ETH_TYPE_IP6:
-            filtered_data.append(frame)
+        if dpkt.ethernet.ETH_TYPE_IP == eth.type:
+            filtered_data.append(eth.data)
     return filtered_data
