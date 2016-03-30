@@ -2,6 +2,7 @@
 
 import receiver
 import frame_filter
+import merger
 
 while 1:
     data = receiver.listen()
@@ -9,3 +10,4 @@ while 1:
     print 'Filtering TCP/IP frames...'
     data = frame_filter.filter_frames(data)
     print 'After filtering there are ', len(data), ' left.'
+    data = merger.tcp_streams(data)
