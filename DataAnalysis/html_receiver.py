@@ -1,6 +1,7 @@
 import socket
 import errno
 from socket import error as SocketError
+import images_analyzer
 
 tcp_ip = '127.0.0.1'
 tcp_port = 5006
@@ -15,8 +16,9 @@ while 1:
         data = conn.recv(buffer_size)
         if not data:
             break
-        print data
+        #print data
         # do sth with data
+        images_analyzer.analyze(data)
         # conn.send("+")  # echo
     except SocketError as e:
          if e.errno != errno.ECONNRESET:
