@@ -7,22 +7,26 @@ import matplotlib.pyplot as plt
 import datetime
 
 
-class ImagesParse(HTMLParser):
+class TagsParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
         self.list = dict()
 
     def handle_starttag(self, tag, attrs):
-        if tag=="img":
-            extension = os.path.splitext(dict(attrs)["src"])[1]
-            if extension in self.list:
-                self.list[extension] += 1
+        try:
+            unicode_tag = tag.decode("utf-8")
+            if unicode_tag in self.list:
+                self.list[unicode_tag] += 1
             else:
-                self.list[extension] = 1
+                self.list[unicode_tag] = 1
+
+        except UnicodeDecodeError:
+            pass
+
 
 
 def analyze(data):
-    h=ImagesParse()
+    h=TagsParser()
     # page='<!DOCTYPE html><html><body><h2>Spectacular Mountain</h2><img src="pic_mountain.jpg" alt="Mountain View" style="width:304px;height:228px;"><img src="pic_mountain.jpg" alt="Mountain View" style="width:304px;height:228px;"><img src="pic_mountain.jpg" alt="Mountain View" style="width:304px;height:228px;"><img src="pic_mountain.jpeg" alt="Mountain View" style="width:304px;height:228px;"></body></html>'
     h.feed(data)
     print(h.list)
@@ -37,9 +41,9 @@ def analyze(data):
     plt.bar(y_pos, values, align='center', alpha=0.5)
     plt.xticks(y_pos, objects, rotation='vertical')
     plt.ylabel('Usage')
-    plt.title('Images extensions')
+    plt.title('Tags usage')
 
-    directory = 'images/'
+    directory = 'tags/'
     if not os.path.isdir(directory):
         os.makedirs(directory)
     plt.savefig(directory + datetime.datetime.now().strftime("%d%m%Y%H%M%S%f") + '.png', bbox_inches='tight')

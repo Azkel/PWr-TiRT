@@ -28,8 +28,3 @@ def forward_html(data):
                     s.send(http_decoded)
                 except dpkt.NeedData:
                     print "Parsing error encountered"
-            else:
-                http = dpkt.http.Request(value)
-
-
-
