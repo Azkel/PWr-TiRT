@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 import socket
-import pickle
-import dpkt
+
 
 def listen():
     tcp_ip = '127.0.0.1'
