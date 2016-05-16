@@ -25,6 +25,7 @@ def forward_html(data):
                         http_decoded = f.read()
                     else:
                         http_decoded = http.body
-                    s.send(http_decoded)
+                    if http is not None and http.body is not None:
+                        s.send(http_decoded)
                 except dpkt.NeedData:
                     print "Parsing error encountered"
