@@ -2,6 +2,8 @@ import dpkt
 import StringIO
 import gzip
 import socket
+import string
+import random
 from StringIO import StringIO
 
 def forward_html(data):
@@ -27,5 +29,13 @@ def forward_html(data):
                         http_decoded = http.body
                     if http is not None and http.body is not None:
                         s.send(http_decoded)
+                    if 'content-type' in http.headers and http.headers.pop('content-type') == 'image/png':
+                        fh =open("extractedImages/"+  randomword(10) + ".png","wb")
+                        fh.write(http_decoded)
+                        fh.close()
+
                 except dpkt.NeedData:
                     print "Parsing error encountered"
+
+def randomword(length):
+   return ''.join(random.choice(string.lowercase) for i in range(length))
