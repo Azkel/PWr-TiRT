@@ -21,7 +21,7 @@ class LinksParser(HTMLParser):
         self.list['inline css'] = 0
 
     def handle_starttag(self, tag, attrs):
-        if tag == 'a':
+        if tag == 'a' and "href" in dict(attrs):
             link = dict(attrs)["href"]
             if link.startswith(('http', 'ftp', 'www')):
                 self.list['external link'] += 1
