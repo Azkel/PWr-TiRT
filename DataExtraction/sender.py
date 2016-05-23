@@ -11,7 +11,11 @@ BUFFER_SIZE = 4096
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((TCP_IP, TCP_PORT))
-
+file = ''
+if len(sys.argv) == 1:
+	file = 'testn.pcap'
+else:
+	file = sys.argv[1];
 p = pcap.pcap('testn.pcap')
 for ts, pkt in p:
     s.send(pkt)

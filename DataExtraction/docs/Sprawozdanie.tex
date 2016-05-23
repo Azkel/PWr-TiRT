@@ -49,7 +49,8 @@ Zgodnie z zaleceniami prowadzącego każda atomowa funkcja realizowana przez pro
 
 \section{Opis implementacji programu}
 \label{dzialanie}
-...
+\subsection{Ekstrakcja danych}
+Wstępnie otrzymane z pliku PCAP zapisy historii połączeń zostają w pierwszym etapie przeczyszczone za pomocą biblioteki \emph{dpkt}. Aplikacja łączy się z pierwszą z usług, w celu wyodrębnienia tych danych, które zawierają paczki Ethernetowe. Następnie paczki te przesyłane są do kolejnej usługi, która zajmuje się podzieleniem ich na podstawie zawartości - grupując poszczególne paczki za pomocą krotek (\emph{IP nadawcy}, \emph{port nadawcy}, \emph{IP odbiorcy}, \emph{Port odbiorcy}). Pogrupowane w ten sposób strumienie łączone są w jeden spójny poprzez kolejną usługę.
 \subsection{Ekstrakcja HTML}
 Tak spreparowane dane przesyłane są następnie do pliku html\_extractor.py, w którym odbywa się wydobywanie kodu html. 
 Ponieważ aplikacja ma za zadanie analizować ruch internetowy należy brać pod uwagę tylko dane przesyłana na porcie 80. Ze względu na fakt, że interesują nas tylko odpowiedzi serwera omawiany moduł ignoruje treść samych zapytań. Odczytanie danych jest możliwe dzięki wykorzystaniu biblioteki dpkt. Dekompresja danych odbywa się przy pomocy biblioteki gzpi po uprzednim sprawdzeniu zawartości nagłówka 'content-encoding'. Zadaniem modułu jest również ekstrakcja obrazków. Osiągane jest to poprzez weryfikacje nagłówka 'content-type', jesli nagłówek ten zawiera wartości typowe dla obrazów to aplikacja zapisuje otrzymany obraz w dedykowanym folderze. Ostatecznie moduł przesyła dane dalej do pliku html\_receiver.py, którego zadaniem jest właściwie tylko dalsze przekazanie kodu do usług odpowiedzialnych za analizę statystyczną.
@@ -58,6 +59,29 @@ Ponieważ aplikacja ma za zadanie analizować ruch internetowy należy brać pod
 Analiza każdej z zaimplementowanych właściwości kodu HTML jest realizowana przez dwa oddzielne pliki: plik serwera - zajmujący się odbieraniem danych oraz plik analizujący - odpowiedzialny za samo przetwarzanie danych. 
 
 \section{Opis usług}
+\subsection{DataExtraction/sender.py}
+Usługa odpowiadająca za załadowanie z pliku PCAP danych. Jako pierwszy argument przyjmuje nazwę pliku PCAP. 
+\mbox{}\\\\
+\textbf{Komunikuje się z usługami:}\\
+\begin{itemize}
+\item DataExtraction/receiver.py
+\end{itemize} 
+
+\subsection{DataExtraction/receiver.py}
+Usługa odpowiadająca za odebranie załadowanych danych do dalszego przetwarzania. Za pomocą Socketu nasłuchuje ona połączenia z plikiem sender.py, agregując odebrane dane w postaci listy i przesyłając je do dalszego przetwarzania.
+\mbox{}\\\\
+\textbf{Komunikuje się z usługami:}\\
+\begin{itemize}
+\item DataExtraction/sender.py
+\end{itemize} 
+
+\subsection{DataExtraction/frame\_filter.py}
+Usługa odpowiadająca za filtrowanie ramek, które nie pochodzą z pakietów typu Ethernet.
+
+Usługa ta nie wymaga współpracy z żadną z innych usług - przyjmuje dane załadowane z pliku PCAP, a następnie zwraca te same dane, z wyłączeniem tych, które powinny być odrzucone. 
+
+\subsection{DataExtraction/merger.py}
+Usługa odpowiadająca za grupowanie ramek, które zostały przefiltrowane przez poprzednią usługę. Usługa ta zarówno grupuje, jak i łączy strumienie w spójne dane, przesyłane do dalszych usług.
 
 \subsubsection{DataExtraction/html\_extractor.py} 
 Usługa odpowiedzialna za wydobywanie kodu html i obrazów.
