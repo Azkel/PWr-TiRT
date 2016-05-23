@@ -12,7 +12,7 @@
 \usepackage{parskip}
 \usepackage{subcaption}
 \title{Teoria i Inżynieria Ruchu Teleinformatycznego \\ Sprawozdanie z projektu}
-\author{Ewelina Kawecka (201420) \\ Michał Smyk (203254)}
+\author{Ewelina Kawecka (201420) \\ Michał Smyk (203254) \\ Mateusz Sitarczyk (203383) \\ Piotr Sobierski (203380)} 
 \graphicspath{ {gfx/} }
 \begin{document}
 \maketitle
@@ -28,14 +28,22 @@ Głównym problemem, na którym skupia się pierwsza część projektu jest ekst
 
 \begin{figure}[h]
 \centering
-\caption{Atomowe funkcje opracowane w ramach pierwszej części projektu}
+\caption{Atomowe usługi opracowane w ramach pierwszej części projektu}
 \label{img:funkcje}
 \includegraphics[width=0.7\textwidth]{Wykres.png}
 \end{figure}
 
 
 Odfiltrowane i przetworzone dane muszą zostać następnie poddane kolejnemu procesowi, którego zadaniem jest wydobycie kodu html w czystej postaci. Podczas ekstrakcji html należy również zwrócić uwagę na kompresję danych i w przypadku jej wystąpienia konieczne jest odpowiednia dekompresja kodu. 
-Tak przygotowane dane poddawane są później m.in. analizie statystycznej. 
+Tak przygotowane dane poddawane są później m.in. analizie statystycznej (Rysunek \ref{img:funkcje2}). 
+
+\begin{figure}[h]
+\centering
+\caption{Atomowe usługi opracowane w ramach drugiej części projektu}
+\label{img:funkcje2}
+\includegraphics[width=0.7\textwidth]{Wykres2.png}
+\end{figure}
+
 
 Zgodnie z zaleceniami prowadzącego każda atomowa funkcja realizowana przez program udostępniona jest w formie usługi - szczegółowe informacje na ich temat dostępne są w rozdziale \ref{dzialanie}. 
 
@@ -52,20 +60,54 @@ Analiza każdej z zaimplementowanych właściwości kodu HTML jest realizowana p
 \section{Opis usług}
 
 \subsubsection{DataExtraction/html\_extractor.py} 
-%\mbox{}\\
+Usługa odpowiedzialna za wydobywanie kodu html i obrazów.
+\mbox{}\\\\
 \textbf{Komunikuje się z usługami:}\\
 \begin{itemize}
 \item DataAnalysys/html\_receiver.py
 \end{itemize} 
 
-\section{Przykładowe wywołanie}
-Program wywołujemy poprzez uruchomienie wszystkich usług, które składają się na jego elementy:
-%\begin{itemize}
-%\item main.py
-%\item frame filter.py
-%\item merger.py
-%\item receiver.py
-%\end{itemize}
+\subsubsection{DataAnalysys/html\_receiver.py} 
+Usługa odpowiedzialna za przekazywanie html do pozostałych usług analizujących dane.
+\mbox{}\\\\
+\textbf{Komunikuje się z usługami:}\\
+\begin{itemize}
+\item DataAnalysys/css\_class\_server.py
+\item DataAnalysys/images\_server.py
+\item DataAnalysys/links\_server.py
+\item DataAnalysys/tags\_server.py
+\end{itemize} 
 
-%Dopiero po uruchomieniu tych plików, możemy za pomocą pliku \emph{sender.py} wysłać plik z rozszerzeniem %\emph{.pcap} jako pierwszy argument, aby wysłać zadany plik do poszczególnych usług w celu ich dalszego %przetworzenia. 
+\subsubsection{DataAnalysys/css\_class\_server.py} 
+Usługa odpowiedzialna za generowanie statystyk dotyczących częstotliwości występowania poszczególnych klas css.
+
+\subsubsection{DataAnalysys/images\_server.py} 
+Usługa odpowiedzialna za generowanie statystyk dotyczących częstotliwości występowania obrazów o poszczególnych rozszerzeniach.
+
+\subsubsection{DataAnalysys/links\_server.py} 
+Usługa odpowiedzialna za generowanie statystyk dotyczących częstotliwości występowania różnych typów linków.
+
+\subsubsection{DataAnalysys/tags\_server.py} 
+Usługa odpowiedzialna za generowanie statystyk dotyczących częstotliwości występowania poszczególnych typów znaczników html.
+
+
+\section{Przykładowe wywołanie}
+\subsection{Sposób wywołania}
+Program wywołujemy poprzez uruchomienie wszystkich usług, które składają się na jego elementy:
+\begin{itemize}
+\item DataExtraction/main.py (Uruchomienie usługi filtrującej dane z pliku pcap)
+\item DataAnalysys/main.py (Uruchomienie usługi odbierającej kod html)
+\item DataAnalysys/main1.py (Uruchomienie usługi analizującej obrazy)
+\item DataAnalysys/main2.py (Uruchomienie usługi analizującej klasy css)
+\item DataAnalysys/main3.py (Uruchomienie usługi analizującej tagi html)
+\item DataAnalysys/main4.py (Uruchomienie usługi analizującej linki)
+\end{itemize}
+
+Po uruchomieniu powyższych usług należy przy pomocy pliku \emph{DataExtraction/sender.py} przesłać dane z pliku \emph{.pcap}, co rozpocznie dalsze przetwarzanie i proces analizy. 
+
+\subsection{Przykładowe wyniki}
+W celu przeprowadzenia testów utworzony został przykładowy plik \emph{.pcap}, który nagrany został podczas przeglądania stron internetowych takich jak: \emph{wp.pl}, \emph{wykop.pl} oraz \emph{onet.pl}. 
+
+W wyniku działania programu wygenerowane zostały następujące wykresy:
+
 \end{document}
