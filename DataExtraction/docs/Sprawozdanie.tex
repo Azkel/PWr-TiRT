@@ -6,6 +6,7 @@
 \usepackage{mathtools}
 \usepackage{graphicx}
 \usepackage{fullpage}
+\usepackage{enumerate}
 \usepackage{float}
 \usepackage{caption}
 \usepackage{parskip}
@@ -42,11 +43,20 @@ Zgodnie z zaleceniami prowadzącego każda atomowa funkcja realizowana przez pro
 \label{dzialanie}
 ...
 \subsection{Ekstrakcja HTML}
-Tak spreparowane dane przesyłane są następnie do pliku \emph{html_extractor.py}, w który odbywa się wydobywanie kodu html. 
-Ponieważ aplikacja ma za zadanie analizować ruch internetowy należy brać pod uwagę tylko dane przesyłana na porcie 80. Ze względu na fakt, że interesują nas tylko odpowiedzi serwera omawiany moduł ignoruje treść samych zapytań. Odczytanie danych jest możliwe dzięki wykorzystaniu biblioteki dpkt. Dekompresja danych odbywa się przy pomocy biblioteki gzpi po uprzednim sprawdzeniu zawartości nagłówka 'content-encoding'. Zadaniem modułu jest również ekstrakcja obrazków. Osiągane jest to poprzez weryfikacje nagłówka 'content-type', jesli nagłówek ten zawiera wartości typowe dla obrazów to aplikacja zapisuje otrzymany obraz w dedykowanym folderze. Ostatecznie moduł przesyła dane dalej do pliku html_receiver.py, którego zadaniem jest właściwie tylko dalsze przekazanie kodu do usług odpowiedzialnych za analizę statystyczną.
+Tak spreparowane dane przesyłane są następnie do pliku html\_extractor.py, w którym odbywa się wydobywanie kodu html. 
+Ponieważ aplikacja ma za zadanie analizować ruch internetowy należy brać pod uwagę tylko dane przesyłana na porcie 80. Ze względu na fakt, że interesują nas tylko odpowiedzi serwera omawiany moduł ignoruje treść samych zapytań. Odczytanie danych jest możliwe dzięki wykorzystaniu biblioteki dpkt. Dekompresja danych odbywa się przy pomocy biblioteki gzpi po uprzednim sprawdzeniu zawartości nagłówka 'content-encoding'. Zadaniem modułu jest również ekstrakcja obrazków. Osiągane jest to poprzez weryfikacje nagłówka 'content-type', jesli nagłówek ten zawiera wartości typowe dla obrazów to aplikacja zapisuje otrzymany obraz w dedykowanym folderze. Ostatecznie moduł przesyła dane dalej do pliku html\_receiver.py, którego zadaniem jest właściwie tylko dalsze przekazanie kodu do usług odpowiedzialnych za analizę statystyczną.
 
 \subsection{Analiza HTML}
+Analiza każdej z zaimplementowanych właściwości kodu HTML jest realizowana przez dwa oddzielne pliki: plik serwera - zajmujący się odbieraniem danych oraz plik analizujący - odpowiedzialny za samo przetwarzanie danych. 
 
+\section{Opis usług}
+
+\subsubsection{DataExtraction/html\_extractor.py} 
+%\mbox{}\\
+\textbf{Komunikuje się z usługami:}\\
+\begin{itemize}
+\item DataAnalysys/html\_receiver.py
+\end{itemize} 
 
 \section{Przykładowe wywołanie}
 Program wywołujemy poprzez uruchomienie wszystkich usług, które składają się na jego elementy:
