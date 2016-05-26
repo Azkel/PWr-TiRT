@@ -1,6 +1,6 @@
 import dpkt
 import socket
-import pickle
+
 
 def listen():
     tcp_ip = '127.0.0.1'
@@ -20,13 +20,10 @@ def listen():
         stream_list.append(data)
         conn.send("+")  # echo
     values = filter_frames(stream_list)
-    print len(values)
-    print 'Tyle zostalo'
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((tcp_ip, tcp_port+1))
     for element in values:
         s.send(element)
-        print 'dupa'
         echo = s.recv(buffer_size)
     s.close()
 
