@@ -61,7 +61,19 @@ Pierwszy z modułów znajduje się w pliku images\_analyzer.py, a zadaniem jego 
 Drugi moduł odpowiedzialny jest za analizę ile razy poszczególne klasy css zostały wykorzystane w kodzie strony. Moduł ten zaimplementowany jest w pliku css\_class\_analyzer.py. Dla każdego znacznika sprawdzany jest jego atrybut class i zliczane są wszystkie wystąpienia klas w nim się znajdujących.\\
 Następnym moduł odpowiedzialny jest za zliczanie liczności wykorzystanych tagów. Algorytm zaimplementowany jest w pliku tag\_sanalyzer.py i opiera się na zliczania kolejnych rozpoczynających się tagów w otrzymanym kodzie.\\
 Ostatni moduł znajduje się w pliku links\_analyzer.py. Zlicza on ilość linków zewnętrznych oraz wewnętrznych, liczbę plików JavaScript'owych wewnętrznych, zewnętrznych oraz znajdujących się bezpośrednio w kodzie i na podobnej zasadzie pliki css. W przypadku linków analizowany jest tag a i jest atrybut href, przy plikach js tag script i ewentualny atrybut src, natomiast przy plikach css tag link, jego atrybut rel oraz ewentualny atrybut href.
-
+\subsection{Struktura katalogów}
+Pliki projektu zostały umieszczone w dwóch katalogach.
+\subsubsection{DataExtraction/}
+Zawiera skrypty odpowiedzialne za ekstrakcję danych oraz wydobywanie kodu html. Zawiera się w nim również podkatalog \emph{extractedImages} przechowujący przechwycone i zapisane na dysku obrazy.
+\subsubsection{DataAnalysis/}
+Zawiera skrypty odpowiedzialne za analizę otrzymanego kodu html. 
+Zawierają się w nim również podkatalogi przechowujące wykresy dotyczące wygenerowanych statystyk, takie jak: 
+\begin{itemize}
+\item \emph{css\_classes} (Zawiera statystyki dot. częstości występowania klas css)
+\item \emph{links}  (Zawiera statystyki dot. częstości występowania różnych typów linków)
+\item  \emph{tags}  (Zawiera statystyki dot. częstości występowania różnych tagów html)
+\item  \emph{images}  (Zawiera statystyki dot. częstości występowania różnych typów obrazków)
+\end{itemize}  
 \section{Opis usług}
 \subsection{DataExtraction/sender.py}
 Usługa odpowiadająca za załadowanie z pliku PCAP danych. Jako pierwszy argument przyjmuje nazwę pliku PCAP. 
