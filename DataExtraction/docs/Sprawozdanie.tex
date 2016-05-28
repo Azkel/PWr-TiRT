@@ -50,7 +50,7 @@ Zgodnie z zaleceniami prowadzącego każda atomowa funkcja realizowana przez pro
 \section{Opis implementacji programu}
 \label{dzialanie}
 \subsection{Ekstrakcja danych}
-Wstępnie otrzymane z pliku PCAP zapisy historii połączeń zostają w pierwszym etapie przeczyszczone za pomocą biblioteki \emph{dpkt}. Aplikacja łączy się z pierwszą z usług, w celu wyodrębnienia tych danych, które zawierają paczki Ethernetowe. Następnie paczki te przesyłane są do kolejnej usługi, która zajmuje się podzieleniem ich na podstawie zawartości - grupując poszczególne paczki za pomocą krotek (\emph{IP nadawcy}, \emph{port nadawcy}, \emph{IP odbiorcy}, \emph{Port odbiorcy}). Pogrupowane w ten sposób strumienie łączone są w jeden spójny poprzez kolejną usługę.
+Wstępnie otrzymane z pliku PCAP zapisy historii połączeń zostają w pierwszym etapie przeczyszczone za pomocą biblioteki \emph{dpkt}. Aplikacja łączy się z pierwszą z usług, w celu wyodrębnienia tych danych, które zawierają paczki Ethernetowe. Następnie paczki te przesyłane są do kolejnej usługi, która zajmuje się podzieleniem ich na podstawie zawartości - grupując poszczególne paczki za pomocą krotek (\emph{IP nadawcy}, \emph{port nadawcy}, \emph{IP odbiorcy}, \emph{Port odbiorcy}). Pogrupowane w ten sposób strumienie łączone są w jeden spójny poprzez kolejną usługę. Połączenia pomiędzy usługami w programie realizuje interfejs \href{https://docs.python.org/2/library/socket.html}{socket}, będący częścią standardowej biblioteki języka Python.
 \subsection{Ekstrakcja HTML}
 Tak spreparowane dane przesyłane są następnie do pliku html\_extractor.py, w którym odbywa się wydobywanie kodu html. 
 Ponieważ aplikacja ma za zadanie analizować ruch internetowy należy brać pod uwagę tylko dane przesyłana na porcie 80. Ze względu na fakt, że interesują nas tylko odpowiedzi serwera omawiany moduł ignoruje treść samych zapytań. Odczytanie danych jest możliwe dzięki wykorzystaniu biblioteki dpkt. Dekompresja danych odbywa się przy pomocy biblioteki gzpi po uprzednim sprawdzeniu zawartości nagłówka 'content-encoding'. Zadaniem modułu jest również ekstrakcja obrazków. Osiągane jest to poprzez weryfikacje nagłówka 'content-type', jeśli nagłówek ten zawiera wartości typowe dla obrazów to aplikacja zapisuje otrzymany obraz w dedykowanym folderze. Ostatecznie moduł przesyła dane dalej do pliku html\_receiver.py, którego zadaniem jest właściwie tylko dalsze przekazanie kodu do usług odpowiedzialnych za analizę statystyczną.
@@ -80,15 +80,16 @@ Usługa odpowiadająca za załadowanie z pliku PCAP danych. Jako pierwszy argume
 \mbox{}\\\\
 \textbf{Komunikuje się z usługami:}\\
 \begin{itemize}
-\item DataExtraction/receiver.py
+\item DataExtraction/receiver.py - połaczenie odbywa się domyślnie na porcie 5005.
 \end{itemize} 
+
 
 \subsection{DataExtraction/receiver.py}
 Usługa odpowiadająca za odebranie załadowanych danych do dalszego przetwarzania. Za pomocą Socketu nasłuchuje ona połączenia z plikiem sender.py, agregując odebrane dane w postaci listy i przesyłając je do dalszego przetwarzania.
 \mbox{}\\\\
 \textbf{Komunikuje się z usługami:}\\
 \begin{itemize}
-\item DataExtraction/sender.py
+\item DataExtraction/sender.py - połączenie odbywa się domyślnie na porcie 5005.
 \end{itemize} 
 
 \subsection{DataExtraction/frame\_filter.py}
@@ -96,8 +97,12 @@ Usługa odpowiadająca za filtrowanie ramek, które nie pochodzą z pakietów ty
 
 Usługa ta nie wymaga współpracy z żadną z innych usług - przyjmuje dane załadowane z pliku PCAP, a następnie zwraca te same dane, z wyłączeniem tych, które powinny być odrzucone. 
 
+Usługa domyślnie nasłuchuje zgłoszeń na porcie 5006, a następnie sama przesyła dane dalej, za pomocą portu 5007.
+
 \subsection{DataExtraction/merger.py}
 Usługa odpowiadająca za grupowanie ramek, które zostały przefiltrowane przez poprzednią usługę. Usługa ta zarówno grupuje, jak i łączy strumienie w spójne dane, przesyłane do dalszych usług.
+
+Usługa ta nasłuchuje na porcie 5007 odbioru danych przesłanych przez usługę frame\_filter.py.
 
 \subsubsection{DataExtraction/html\_extractor.py} 
 Usługa odpowiedzialna za wydobywanie kodu html i obrazów.
@@ -135,7 +140,9 @@ Usługa odpowiedzialna za generowanie statystyk dotyczących częstotliwości wy
 \subsection{Sposób wywołania}
 Program wywołujemy poprzez uruchomienie wszystkich usług, które składają się na jego elementy:
 \begin{itemize}
-\item DataExtraction/main.py (Uruchomienie usługi filtrującej dane z pliku pcap)
+\item DataExtraction/receiver.py (Uruchomienie usługi odbierającej dane z pliku pcap)
+\item DataExtraction/frame\_filter.py (Uruchomienie usługi filtrującej ramki Ethernet)
+\item DataExtraction/main.py (Uruchomienie usługi łączącej strumienie)
 \item DataAnalysys/main.py (Uruchomienie usługi odbierającej kod html)
 \item DataAnalysys/main1.py (Uruchomienie usługi analizującej obrazy)
 \item DataAnalysys/main2.py (Uruchomienie usługi analizującej klasy css)
@@ -152,33 +159,35 @@ W celu przeprowadzenia testów utworzony został przykładowy plik \emph{.pcap},
 
 W wyniku działania programu wygenerowane zostały następujące wykresy:
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \caption{Przykładowy wykres dla częstości występowania klas css.}
 \label{img:wykresCss}
 \includegraphics[width=0.7\textwidth]{WykresCss.png}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \caption{Przykładowy wykres dla częstości występowania tagów html.}
 \label{img:wykresTagi}
 \includegraphics[width=0.7\textwidth]{WykresTagi.png}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \caption{Przykładowy wykres dla częstości występowania obrazków o poszczególnych rozszerzeniach.}
 \label{img:wykresObrazki}
 \includegraphics[width=0.7\textwidth]{WykresObrazki.png}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \caption{Przykładowy wykres dla częstości występowania różnych typów linków.}
 \label{img:wykresLinków}
 \includegraphics[width=0.7\textwidth]{WykresLinki.png}
 \end{figure}
 
-
+\section {Dalsze możliwości rozwoju}
+Modularność aplikacji daje znaczące możliwości rozbudowy aplikacji o kolejne usługi i funkcje. Jedną z opcji, jaką można podjąć jest analiza zupełnie innych danych niż te, które zostały przerobione w ramach już istniejących funkcjonalności. W zależności od tego, jakie dane nas interesują możemy spróbować zdobyć przesyłane w ramach połączenia dane z żądań typu POST, lub dopisać skrypt, który łamałby zabezpieczenia HTTPS dla słabszych kluczy kryptograficznych. Możliwości jest oczywiście znacznie więcej, a te wymienione tutaj stanowią jedynie mały zestaw przykładów.
+Dodatkowo warto mieć na uwadze, że elementy, z których zbudowana jest aplikacja mogą również zostać użyte jako fragment innych projektów - jeżeli interesują nas badania zgłoszeń TCP/IP, wystarczą pierwsze dwie usługi z aplikacji - reszta może zostać zastąpiona całkowicie innymi komponentami, które przeprowadzą analizę biorąc pod uwagę inne aspekty, niż te powiązane z danymi przesyłanymi przez protokół HTTP. Wykorzystując odpowiednie elementy projektu można przykładowo przefiltrować dane w inny sposób - np. przeanalizować dane uzyskane w ramach broadcastów ARP.
 \end{document}
